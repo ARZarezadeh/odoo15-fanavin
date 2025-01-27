@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/custom_addons/activity_monitor/models/res_users.py" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/odoo/addons/mail/models/res_users.py" dialect="GenericSQL" />
+    <file url="PROJECT" dialect="GenericSQL" />
+  </component>
+</project>
