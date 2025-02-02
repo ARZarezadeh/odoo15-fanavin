@@ -22,25 +22,23 @@ class Users(models.Model):
         for model in all_models2:
             model_name = model
             try:
-                # Check if the model has the write_uid and write_date fields
                 if 'write_uid' in self.env[model_name]._fields and 'write_date' in self.env[model_name]._fields:
-                    # Fetch records updated by the current user
                     records = self.env[model_name].sudo().search(
                         [('write_uid', '=', current_user_id)],
                         order='write_date desc', limit=10
                     )
                     for record in records:
-                        if record.write_date:  # Ensure write_date is not None
+                        record_id = getattr(record, "res_id", None) or getattr(record, "id", None)
+                        record_model = getattr(record, "res_model", None) or getattr(record, "model",None) or model_name
+                        if record.write_date and record_id and record_model:
                             user_changes.append({
-                                'model_name': model,
-                                'model': model,
-                                'id': record.res_id if record.res_id else record.id,
-                                'write_date': record.write_date,  # Already a datetime object
+                                'model_name': record_model or model_name,
+                                'model': record_model,
+                                'id': record_id,
+                                'write_date': record.write_date,
                             })
             except Exception as e:
-                # Handle inaccessible models or issues
                 self.env.cr.rollback()
                 _logger.warning(f"Skipping model {model_name}: {e}")
-        user_changes = heapq.nlargest(10, user_changes, key=lambda k: k['write_date'])
-
+        # user_changes = heapq.nlargest(10, user_changes, key=lambda k: k['write_date'])
         return user_changes

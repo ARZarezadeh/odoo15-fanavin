@@ -3,10 +3,8 @@
 import {qweb as QWeb} from 'web.core';
 import Widget from 'web.Widget';
 import systrayMenu from 'web.SystrayMenu';
-import Time from 'web.time';
 import session from 'web.session';
 
-const {Component} = owl;
 
 let ActivityMonitorMenu = Widget.extend({
     name: 'activity_monitor_menu',
@@ -36,7 +34,6 @@ let ActivityMonitorMenu = Widget.extend({
             args: [],
             kwargs: {context: session.user_context},
         }).then(function (data) {
-            console.log("DATA:::", data, data.length)
             self._changes = data;
             self._changeCounter = data.length
             self.$('.o_last_changes_counter').text(self._changeCounter);
@@ -86,10 +83,6 @@ let ActivityMonitorMenu = Widget.extend({
         if (actionXmlid) {
             this.do_action(actionXmlid);
         } else {
-            let domain = [['activity_ids.user_id', '=', session.uid]]
-            if (targetAction.data('domain')) {
-                domain = domain.concat(targetAction.data('domain'))
-            }
 
             this.do_action({
                 type: 'ir.actions.act_window',
