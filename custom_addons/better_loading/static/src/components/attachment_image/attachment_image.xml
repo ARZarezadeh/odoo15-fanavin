@@ -1,29 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <t t-name="better_loading.FileUploadWithProgress">
-        <div class="file-upload-container">
-            <input type="file" class="file-input" t-on-change="uploadFile"/>
-            <div class="upload-progress-wrapper">
-                <progress max="100" t-att-value="progress" class="upload-progress-bar"></progress>
-                <span t-esc="progress"/>% - <span t-esc="estimatedTime"/>
+    <t t-inherit="mail.AttachmentImage" t-inherit-mode="extension">
+        <xpath expr="//div[contains(@class, 'o_AttachmentImageUploading')]" position="after">
+            <div class="custom-upload_message_wrapper">
+                <div class="custom-upload-message">
+                    Uploading... Please wait.
+                </div>
+                <t t-if="attachmentImage.attachment.progress">
+                    <progress max="100" t-att-value="attachmentImage.attachment.progress"
+                              class="custom-progress-bar">
+                    </progress>
+                    <div class="custom-progress-percentage">
+                        <t t-esc="attachmentImage.attachment.progress"/>%
+                    </div>
+                </t>
             </div>
-        </div>
+        </xpath>
     </t>
 </templates>
-
-
-<!--<?xml version="1.0" encoding="UTF-8"?>-->
-<!--<templates xml:space="preserve">-->
-<!--    <t t-inherit="mail.AttachmentImage" t-inherit-mode="extension">-->
-<!--        <xpath expr="//div[contains(@class, 'o_AttachmentImageUploading')]" position="after">-->
-<!--            <div class="custom-upload_message_wrapper">-->
-<!--                <div class="custom-upload-message">-->
-<!--                Uploading... Please wait.-->
-<!--            </div>-->
-<!--                &lt;!&ndash;                <progress max="100" t-att-value="attachmentImage.progressState.percent"&ndash;&gt;-->
-<!--                &lt;!&ndash;                          class="custom-progress-bar"></progress>&ndash;&gt;-->
-<!--                <progress max="100" value="50" class="custom-progress-bar"></progress>-->
-<!--            </div>-->
-<!--        </xpath>-->
-<!--    </t>-->
-<!--</templates>-->

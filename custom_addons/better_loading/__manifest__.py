@@ -15,7 +15,9 @@
         ],
         'web.assets_backend': [
             'better_loading/static/src/components/*/*.js',
-            'better_loading/static/src/components/attachment_image/attachment_image.scss'
+            'better_loading/static/src/components/attachment_image/attachment_image.scss',
+            'better_loading/static/src/models/attachment.js'
+
         ],
     }
 

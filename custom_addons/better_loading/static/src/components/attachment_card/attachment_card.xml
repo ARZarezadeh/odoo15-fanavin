@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="mail.AttachmentCard" t-inherit-mode="extension">
+        <xpath expr="//div[contains(@class, 'o_AttachmentCard_aside')]" position="before">
+            <div class="custom-upload_message_wrapper">
+                <t t-if="attachmentCard.attachment.progress">
+                    <div class="custom-upload-message">
+                        Uploading... Please wait.
+                    </div>
+                    <progress max="100" t-att-value="attachmentCard.attachment.progress"
+                              class="custom-progress-bar">
+                    </progress>
+                    <div class="custom-progress-percentage">
+                        <t t-esc="attachmentCard.attachment.progress"/>%
+                    </div>
+                </t>
+            </div>
+        </xpath>
+    </t>
+</templates>

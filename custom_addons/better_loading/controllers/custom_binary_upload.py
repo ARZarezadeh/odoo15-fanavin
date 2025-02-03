@@ -1,53 +1,53 @@
-from odoo import http
-from odoo.http import request
 import json
-import base64
 import time
 
+from odoo.exceptions import AccessError
+from odoo.http import request
+from odoo.tools.translate import _
 
-class CustomBinaryUpload(http.Controller):
+from odoo import http
 
-    @http.route('/custom/upload_attachment', type='http', auth="user", methods=['POST'], csrf=False)
-    def upload_attachment(self, model, id, ufile):
-        """
-        Custom file upload controller that tracks upload progress and returns real-time percentage.
-        """
-        print("***************************inside custom upload")
-        files = request.httprequest.files.getlist('ufile')
-        for file in files:
-            file_size = file.content_length  # Get total file size
-            chunk_size = 4096  # Read in chunks (4KB per read)
-            uploaded_size = 0  # Track uploaded bytes
 
-            encoded_data = b""
+class DiscussController(http.Controller):
 
-            # Read file in chunks to simulate progress
-            while True:
-                chunk = file.read(chunk_size)
-                if not chunk:
-                    break
-                encoded_data += chunk
-                uploaded_size += len(chunk)
-
-                progress_percent = round((uploaded_size / file_size) * 100)
-
-                # Simulate delay (remove this in production)
-                time.sleep(0.1)
-
-                # Send intermediate progress (if using WebSockets, this can be pushed dynamically)
-                request.env.cr.commit()  # Commit to avoid transaction rollback in case of failure
-
-            # Store file as attachment
-            attachment = request.env['ir.attachment'].create({
-                'name': file.filename,
-                'datas': base64.b64encode(encoded_data),
-                'res_model': model,
-                'res_id': int(id),
+    @http.route('/mail/attachment/upload', methods=['POST'], type='http', auth='public')
+    def mail_attachment_upload(self, ufile, thread_id, thread_model, is_pending=False, **kwargs):
+        channel_partner = request.env['mail.channel.partner']
+        if thread_model == 'mail.channel':
+            channel_partner = request.env['mail.channel.partner']._get_as_sudo_from_request_or_raise(request=request,
+                                                                                                     channel_id=int(
+                                                                                                         thread_id))
+        vals = {
+            'name': ufile.filename,
+            'raw': ufile.read(),
+            'res_id': int(thread_id),
+            'res_model': thread_model,
+        }
+        if is_pending and is_pending != 'false':
+            # Add this point, the message related to the uploaded file does
+            # not exist yet, so we use those placeholder values instead.
+            vals.update({
+                'res_id': 0,
+                'res_model': 'mail.compose.message',
             })
-
-        return json.dumps({
-            'id': attachment.id,
-            'filename': file.filename,
-            'size': file_size,
-            'progress': 100,  # Ensure final progress is 100%
-        })
+        if channel_partner.env.user.share:
+            # Only generate the access token if absolutely necessary (= not for internal user).
+            vals['access_token'] = channel_partner.env['ir.attachment']._generate_access_token()
+        try:
+            attachment = channel_partner.env['ir.attachment'].create(vals)
+            attachment._post_add_create()
+            attachmentData = {
+                'filename': ufile.filename,
+                'id': attachment.id,
+                'mimetype': attachment.mimetype,
+                'name': attachment.name,
+                'size': attachment.file_size
+            }
+            if attachment.access_token:
+                attachmentData['accessToken'] = attachment.access_token
+        except AccessError:
+            attachmentData = {'error': _("You are not allowed to upload an attachment here.")}
+        return request.make_response(
+            data=json.dumps(attachmentData),
+            headers=[('Content-Type', 'application/json')]
+        )

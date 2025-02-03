@@ -1,23 +1,17 @@
-// ------------------------------------------------------------------
-// Layout
-// ------------------------------------------------------------------
-
 .custom-upload_message_wrapper {
-  display: block;
-  margin-top: 20px;
-
-}
-
-.custom-upload-message {
-  font-weight: bold;
-  color: white;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 5px;
-  border-radius: 5px;
+    text-align: center;
+    margin-top: 10px;
 }
 
 .custom-progress-bar {
-  width: 100%;
-  height: 5px;
-  background: green;
+    width: 100%;
+    height: 8px;
+    margin-top: 5px;
+}
+
+.custom-progress-percentage {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 5px;
 }
