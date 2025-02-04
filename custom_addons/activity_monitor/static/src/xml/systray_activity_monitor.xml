@@ -44,5 +44,17 @@
                 </div>
             </t>
         </div>
+         <div class="text-center py-2">
+            <t t-if="!widget._showAllChanges">
+                <button type="button" class="btn btn-secondary o_show_more_changes">
+                    Show More
+                </button>
+            </t>
+            <t t-else="">
+                <button type="button" class="btn btn-secondary o_show_less_changes">
+                    Show Less
+                </button>
+            </t>
+        </div>
     </t>
 </templates>
